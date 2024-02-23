@@ -1,0 +1,10 @@
+// Vendors
+// - CSS from external libraries and frameworks
+@import "~bootstrap/scss/functions";
+
+@import "./vendors/_bootstrap.scss";
+@import "./vendors/_bootstrap-colorpicker.scss";
+@import "./vendors/_bootstrap-select.scss";
+
+
+@import "./pages/_index.scss";

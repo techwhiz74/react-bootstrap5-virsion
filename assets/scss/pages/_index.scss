@@ -1,0 +1,277 @@
+@font-face {
+    font-family: 'Montserrat';
+    src: url("https://static1.squarespace.com/static/61d847565e8825750f6808c1/t/64230b5b7b817539830fbc6c/1680018267620/montserrat-v25-latin-regular.woff")
+      format("woff"),
+    url("https://static1.squarespace.com/static/61d847565e8825750f6808c1/t/64230b452dfc586bc97d2d87/1680018245260/montserrat-v25-latin-regular.woff2")
+      format("woff2");
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    --color-dark: #32273b;
+    --color-light: #c8a47e;
+    background-color: transparent;
+    color: var(--color-light);
+    overflow: auto;
+    min-width: 600px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+header {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.container, .container-fluid {
+    padding-right: var(--bs-gutter-x, .75rem);
+    padding-left: var(--bs-gutter-x, .75rem);
+}
+
+div.contents {
+    margin-top: -10px;
+}
+
+svg#logo {
+    overflow: visible;
+}
+
+.accordion {
+    position: absolute;
+    z-index: 100; /* Assurez-vous qu'il est au-dessus de preview */
+    width: 100%; /* ou une largeur spécifique si nécessaire */
+    margin-left: -10px;
+    padding: 0; /* Ajouté pour réinitialiser le padding */
+    border: none; /* Ajouté pour réinitialiser la bordure */
+}
+
+.accordion, .accordion .card {
+    background-color: var(--color-light);
+    overflow: visible;
+}
+
+.card-body {
+    padding: 0;
+}
+
+div#toolbar {
+    flex-direction: column;
+    background-color: var(--color-dark);
+    padding: 5px;
+    //border-right: 1px solid var(--color-light);
+}
+
+.toolbar-toggle {
+    display: block; /* Assurez-vous que ce soit visible selon votre logique d'application */
+    color: var(--color-dark);
+}
+
+.toolbar-toggle.disabled {
+    pointer-events: none;
+}
+
+/* Styles pour #preview */
+#preview {
+    background-color:#F1F1F1;
+    overflow: auto;
+    padding: 0;
+    outline: none;
+    cursor: grab;
+    min-height: calc(100vh - 20px);
+    transition: z-index 0.3s;
+}
+
+#preview.toolbar-shown {
+    z-index: 90;
+}
+
+#preview.toolbar-hidden {
+    z-index: 101;
+}
+
+#fan {
+    margin-top: 40px;
+}
+
+.advanced-settings {
+    /* Styles for advanced settings, initially hidden */
+    display: none;
+    background-color: #f1f1f1;
+    border-top: 1px solid rgba(0, 0, 0, .125);
+    padding: 15px;
+}
+
+#advanced-parameters {
+    top: 200px;
+    right: 10px;
+}
+
+div#genealogies {
+    color: var(--color-dark);
+}
+
+div.row {
+    margin: 0;
+}
+
+input#file {
+    position: absolute;
+    font-size: calc(10px + 1.8vmin); //50px;
+    opacity: 0;
+    right: 0;
+    top: 0;
+}
+
+.btn {
+    color: var(--color-light);
+    background-color: var(--color-dark);
+    border-color: var(--color-light);
+}
+
+.btn:hover {
+    color: var(--color-dark);
+    background-color: var(--color-light);
+    border-color: var(--color-dark);
+}
+
+div.file-button {
+    position: relative;
+    overflow: hidden;
+}
+
+.button-zoom {
+    position: absolute;
+}
+
+#zoom-plus {
+    top: 10px;
+    right: 10px;
+}
+
+#zoom-reset {
+    top: 55px;
+    right: 10px;
+}
+
+#zoom-minus {
+    top: 100px;
+    right: 10px;
+}
+
+#full-screen-toggle {
+    top: 150px;
+    right: 10px;
+}
+
+#advanced-parameters {
+    top: 200px;
+    right: 10px;
+}
+
+#tip {
+    position: absolute;
+    white-space: nowrap;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+div#map {
+    height: 100px;
+    /* FIXME */
+}
+
+.bootstrap-select:not([class*="col-"]):not([class*="form-control"]):not(.input-group-btn) {
+    width: 180px;
+    left: 0;
+    /* position: absolute; */
+    /* This is being removed */
+}
+
+#overlay {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    background-color: rgb(255, 255, 255);
+    /* Black fallback color */
+    background-color: rgba(255, 255, 255, 0.9);
+    visibility: visible;
+    opacity: 1;
+}
+
+#overlay.overlay-hidden {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0.2s, opacity 0.2s linear;
+}
+
+#loading {
+    position: absolute;
+    text-align: center;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+#gradient-preview {
+    width: 100%;
+    height: 30px;
+    background-color: white;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+}
+
+#tip.tip-hidden {
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transition: visibility 0.2s linear, opacity 0.2s linear;
+    -moz-transition: visibility 0.2s linear, opacity 0.2s linear;
+    -o-transition: visibility 0.2s linear, opacity 0.2s linear;
+}
+
+#initial-group {
+    margin: 0;
+    text-align: center;
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.preview-drop {
+    border: 5px dashed #3b3b3b;
+}
+
+.form-check {
+    display: inline-block;
+    margin-right: 10px; /* Ajoutez une marge à droite pour l'espacement */
+  }
+
+  #advancedModal .modal-content, 
+  #emailModal .modal-content,
+  #confirmationModal .modal-content {
+      background-color: #f1f1f1; /* Lighter background for modals */
+  }
+
+  h1, h2, h3, h4, h5, h6, p, label {
+    color: #c8a47e;
+  }
+
+  .bootstrap-select > .disabled {
+    pointer-events: auto !important;
+  }
+
+  .btn:disabled {
+    pointer-events: auto !important;
+    cursor: default;
+  }

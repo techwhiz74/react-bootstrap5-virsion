@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="${locale}">
+    <head>
+        <meta charset="UTF-8">
+        <title><%=__('insee.title')%></title>
+
+        <meta name="language" content="${locale}">
+        <meta http-equiv="content-language" content="${lang}">
+
+        <meta name="author" content="Florian Cassayre">
+
+        <meta name="robots" content="index, follow">
+
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:site" content="@flomine68">
+        <meta name="twitter:title" content="${__('insee.title')}">
+        <meta name="twitter:description" content="${__('insee.description')}">
+        <meta name="twitter:image" content="https://arbre.app/cover_insee.png">
+        <meta name="twitter:creator" content="@flomine68">
+
+        <meta property="og:title" content="${__('insee.title')}">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="${urlGenerator('insee')}">
+        <meta property="og:image" content="https://arbre.app/cover_insee.png">
+        <meta property="og:description" content="${__('insee.description')}">
+        <meta property="og:site_name" content="arbre.app">
+
+        <meta name="msapplication-TileColor" content="#ffffff">
+
+        <meta name="theme-color" content="#ffffff">
+    </head>
+    <body>
+        <a class="btn btn-outline-secondary btn-sm" href=".." role="button" style="position: absolute; top: 10px; left: 10px;">
+            <i class="fas fa-long-arrow-alt-left"></i>
+            <%=__('common.other_services')%>
+        </a>
+
+        <div class="dropdown" style="position: absolute; top: 10px; right: 10px;">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-globe" aria-hidden="true"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                <h6 class="dropdown-header"><%=__('common.language')%></h6>
+                <a class="dropdown-item ${lang === 'fr' ? 'active' : ''}" href="${urlGeneratorLang('fr', 'insee')}">Français</a>
+                <a class="dropdown-item ${lang === 'en' ? 'active' : ''}" href="${urlGeneratorLang('en', 'insee')}">English</a>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="text-center">
+                <i class="fas fa-book fa-4x"></i>
+                <h2 class="mt-4"><%=__('insee.title')%></h2>
+            </div>
+
+            <div class="contents" style="margin-top: 20px;">
+                <p>
+                    <%=__('insee.search_in')%>
+                </p>
+
+                <form action="#">
+                    <div class="form-row">
+                        <div class="col-3">
+                            <input type="text" id="surname" class="form-control" placeholder="${__('insee.surname_hint')}">
+                            <div class="invalid-feedback"><%=__('insee.surname_required')%></div>
+                        </div>
+                        <div class="col-3">
+                            <input type="text" id="name" class="form-control" placeholder="${__('insee.name_hint')}">
+                        </div>
+                        <div class="col-4">
+                            <select id="place" data-live-search="true" data-width="100%"></select>
+                        </div>
+                        <div class="col-2">
+                            <button type="submit" id="search" class="btn btn-primary" style="width: 100%"><i class="fas fa-search fa-fw"></i> <%=__('insee.search')%></button>
+                        </div>
+                    </div>
+
+
+                    <div class="form-row mt-3">
+
+                        <div class="col-2 offset-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-filter"></i></span>
+                                </div>
+                            <select class="form-control" id="event">
+                                <option value="birth"><%=__('insee.birth')%></option>
+                                <option value="death"><%=__('insee.death')%></option>
+                            </select>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="input-group">
+                                <select class="form-control" id="date-kind">
+                                    <option value="range"><%=__('insee.year_between')%></option>
+                                    <option value="exact"><%=__('insee.year_in')%></option>
+                                </select>
+                                <input type="number" id="after" class="form-control" aria-label="${__('insee.starting_year')}" placeholder="${__('insee.starting_short')}" min="0" max="2020">
+                                <input type="number" id="before" class="form-control" aria-label="${__('insee.ending_year')}" placeholder="${__('insee.ending_short')}" min="0" max="2020">
+                                <input type="number" id="exact" class="form-control hidden" aria-label="${__('insee.exact_year')}" placeholder="${__('insee.exact_short')}" min="0" max="2020">
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-sort"></i></span>
+                                </div>
+                                <select class="form-control" id="order">
+                                    <option value="ascending"><%=__('insee.increasing')%></option>
+                                    <option value="descending"><%=__('insee.decreasing')%></option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="col-2 offset-1">
+                            <button id="reset" class="btn btn-light hidden" style="width: 100%"><i class="fas fa-undo-alt fa-fw"></i> <%=__('insee.reset')%></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div style="position: absolute; display: none">
+                <i id="male" class="fas fa-mars fa-lg" style="color: #54aa98"></i>
+                <i id="female" class="fas fa-venus fa-lg" style="color: #755ea1"></i>
+            </div>
+
+            <div id="warning-template" class="hidden">
+                <div id="warning-alert" class="alert alert-warning alert-dismissible mt-3 fade show" role="alert">
+                    <i class="fas fa-exclamation-circle fa-fw"></i> <%=__('insee.search_produced_warnings')%>
+                    <ul id="warning-list" style="margin: 0">
+
+                    </ul>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="${__('common.close')}">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="warnings-container">
+
+            </div>
+
+
+            <div class="hidden" id="content-container" style="margin-top: 10px;">
+                <ul class="nav nav-tabs" id="tabs" role="tablist" style="border-bottom: none;">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="results-tab" href="#results-content" data-toggle="tab" role="tab" aria-controls="results-content" aria-selected="true"><%=__('insee.tabs.results')%></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="statistics-tab" href="#statistics-content" data-toggle="tab" role="tab" aria-controls="statistics-content" aria-selected="false"><%=__('insee.tabs.statistics')%></a>
+                    </li>
+                </ul>
+                <div style="float: left; padding-left: 10px; padding-top: 11px;">
+                    <div id="popover-content" class="hidden">
+                        <div class="input-group">
+                            <input type="text" class="form-control link" readonly>
+                            <!--<div class="input-group-append">
+                                <button class="btn btn-outline-secondary copy" type="button">Copier</button>
+                            </div>-->
+                        </div>
+                    </div>
+                    <button type="button" id="permalink" class="btn btn-info mr-1"
+                            data-placement="top"
+                            data-toggle="popover"
+                            title="${__('insee.permalink_to_this')}">
+                        <i class="fas fa-link"></i>
+                    </button>
+
+                </div>
+                <div class="contents tab-content" style="padding-top: 10px; padding-bottom: 10px; padding-left: 0; padding-right: 0;">
+                    <div id="results-content" class="tab-pane fade show active" role="tabpanel" aria-labelledby="results-tab">
+                        <div class="row">
+                            <div class="col-4" style="padding-left: 4px;">
+                                <div class="btn-group" id="download-tooltip" data-toggle="tooltip" data-placement="top" title="${__('insee.exportation_only_available')}">
+                                    <button type="button" id="download-button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-file-download fa-fw"></i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <h6 class="dropdown-header"><%=__('insee.available_formats')%></h6>
+                                        <a class="dropdown-item" href="#" id="download-csv">
+                                            <i class="fas fa-file-csv fa-fw"></i>
+                                            <%=__('insee.csv_format')%>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8" style="padding-right: 0;">
+                                <div id="results-texts" class="text-right align-middle" style="padding-right: 10px;">
+                                    <span class="font-weight-bold count"></span>
+                                    &#183;
+                                    <span id="page-info"></span>
+                                    &#183;
+                                    <%=__('insee.results_per_page')%>
+                                    <select id="limit" class="selectpicker w-auto">
+                                        <option value="25" selected>25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div id="no-results" class="text-center mt-2 hidden">
+                            <h5><%=__('common.no_result')%></h5>
+                            <p class="font-italic"><%=__('insee.try_different_query')%></p>
+                        </div>
+                        <table class="table mt-2" id="persons">
+                            <thead>
+                            <tr style="border-top: hidden">
+                                <th scope="col"><%=__('insee.person.gender')%></th>
+                                <th scope="col"><%=__('insee.person.surname')%></th>
+                                <th scope="col"><%=__('insee.person.given')%></th>
+                                <th scope="col"><%=__('insee.person.event')%></th>
+                                <th scope="col"><%=__('insee.person.date')%></th>
+                                <th scope="col"><%=__('insee.person.place')%></th>
+                            </tr>
+                            </thead>
+                        </table>
+                        <nav aria-label="Navigation">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item navigation-arrow">
+                                    <a class="page-link left-arrow" href="#" aria-label="${__('common.previous')}">
+                                        <span aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only"><%=__('common.previous')%></span>
+                                    </a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item navigation-arrow">
+                                    <a class="page-link right-arrow" href="#" aria-label="${__('common.next')}">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only"><%=__('common.next')%></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <div id="statistics-content" class="tab-pane fade" role="tabpanel" aria-labelledby="statistics-tab" style="padding-left: 10px; padding-right: 10px;">
+                        <div class="row">
+                            <div class="col-8 offset-4" style="padding: 0; height: 40px;">
+                                <div class="text-right align-middle">
+                                    <!--<span class="font-weight-bold count"></span>
+                                    &#183;-->
+                                    <span id="count-events">? <%=__('insee.places_found')%></span>
+                                    <!--&#183;
+                                    <a href="#">
+                                        <i class="fas fa-info-circle fa-fw"></i>
+                                    </a>-->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <h4><%=__('insee.geographical_distribution')%></h4>
+                            <%=__('insee.for_the_names')%> "<em id="surname-name"></em>", <%=__('insee.all_times')%>
+                        </div>
+                        <div id="map" class="col-md-6 offset-md-3 col-xs-12 my-4">
+
+                        </div>
+                        <!--<div id="time" class="col-6 offset-3" style="min-height: 100px;">
+
+                        </div>-->
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal fade" id="server-message" tabindex="-1" role="dialog" aria-labelledby="server-message-title" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="server-message-title"><%=__('insee.server_message')%></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="${__('common.close')}">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div id="server-message-content" class="modal-body">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center pt-3">
+                <%=__('insee.the_database_contains')%> <strong>25 322 258</strong> <%=__('insee.records')%> (<em>décembre 2020</em>)
+                <br />
+                <a href="#" id="help"><i class="fas fa-info-circle fa-fw"></i> <%=__('insee.general_informations')%></a>
+
+                <div class="modal fade" id="help-modal" tabindex="-1" role="dialog" aria-labelledby="help-modal" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title"><%=__('insee.general_informations')%></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="${__('common.close')}">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body text-left">
+                                <p>
+                                    <em><%=__('insee.informations.disclaimer')%></em>
+                                </p>
+                                <h6><%=__('insee.informations.introduction')%></h6>
+                                <p>
+                                    <%=__('insee.informations.introduction_body')%>
+                                </p>
+                                <h6><%=__('insee.informations.names')%></h6>
+                                <p>
+                                    <%=__('insee.informations.names_body')%>
+                                </p>
+                                <h6><%=__('insee.informations.places')%></h6>
+                                <p>
+                                    <%=__('insee.informations.places_body')%>
+                                </p>
+                                <h6><%=__('insee.informations.dates')%></h6>
+                                <p>
+                                    <%=__('insee.informations.dates_body')%>
+                                </p>
+                                <h6><%=__('insee.informations.warnings')%> <i class="fas fa-exclamation-circle fa-fw"></i></h6>
+                                <p>
+                                    <%=__('insee.informations.warnings_body_1')%>
+                                </p>
+                                <p>
+                                    <%=__('insee.informations.warnings_body_2')%>
+                                </p>
+                                <p>
+                                    <%=__('insee.informations.warnings_body_3')%>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="footer-copyright text-center py-1 font-italic">
+                <div>
+                    <%=__('insee.made_and_hosted_by')%> <a href="https://florian.cassayre.me" target="_blank">Florian Cassayre</a> (<a href="https://florian.cassayre.me/contact" target="_blank"><%=__('insee.contact')%></a>)
+                </div>
+                <div>
+                    <%=__('insee.not_affiliated')%> (<a href="https://www.insee.fr/fr/information/4190491" target="_blank"><%=__('insee.source_data')%></a>)
+                </div>
+                <div>
+                    <a href="#" id="api"><i class="fas fa-wrench fa-fw"></i> <%=__('insee.api')%></a>
+                </div>
+                <a href="https://github.com/FlorianCassayre/insee-db" target="_blank" style="color: black">
+                    <i class="fab fa-github fa-2x mt-4" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="${__('insee.source_code_on')}"></i>
+                </a>
+            </div>
+
+            <div class="modal fade" id="api-modal" tabindex="-1" role="dialog" aria-labelledby="api-modal" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><%=__('insee.api_title')%></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="${__('common.close')}">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-left">
+                            <p>
+                                <%=__('insee.api_can_be_used')%>
+                            </p>
+
+                            <h5><%=__('insee.generals')%></h5>
+
+                            <p>
+                                <%=__('insee.endpoint_is')%> <kbd>https://insee.arbre.app</kbd>
+                            </p>
+                            <p>
+                                <%=__('insee.results_are_returned')%>
+                            </p>
+                            <p>
+                                <%=__('insee.no_authentication_required')%>
+                                <%=__('insee.soft_limitations')%>
+                                <%=__('insee.user_agent')%>
+                            </p>
+
+                            <h5><%=__('insee.records_querying')%></h5>
+
+                            <p>
+                                <%=__('insee.records_querying_description')%>
+                            </p>
+                            <p>
+                                <strong><%=__('insee.method')%></strong> <kbd>/persons</kbd> (<em>GET</em>)
+                            </p>
+
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"><%=__('insee.method_fields.parameter')%></th>
+                                        <th scope="col"><%=__('insee.method_fields.description')%></th>
+                                        <th scope="col"><%=__('insee.method_fields.value_type')%></th>
+                                        <th scope="col"><%=__('insee.method_fields.default_value')%></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>surname</code></td>
+                                        <td><%=__('insee.method_persons.surname')%></td>
+                                        <td><%=__('insee.parameter_types.string')%></td>
+                                        <td><%=__('insee.parameter_types.required')%></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>name</code></td>
+                                        <td><%=__('insee.method_persons.given')%></td>
+                                        <td><%=__('insee.parameter_types.string')%></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>place</code></td>
+                                        <td><%=__('insee.method_persons.place_id')%><sup>*</sup></td>
+                                        <td><%=__('insee.parameter_types.positive_integer')%></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>event</code></td>
+                                        <td><%=__('insee.method_persons.event_type')%></td>
+                                        <td><code>birth</code> <%=__('common.or')%> <code>death</code></td>
+                                        <td><code>birth</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>after</code></td>
+                                        <td><%=__('insee.method_persons.after_year')%></td>
+                                        <td><%=__('insee.parameter_types.year')%></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>before</code></td>
+                                        <td><%=__('insee.method_persons.before_year')%></td>
+                                        <td><%=__('insee.parameter_types.year')%></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>order</code></td>
+                                        <td><%=__('insee.method_persons.order')%></td>
+                                        <td><code>ascending</code> <%=__('common.or')%> <code>descending</code></td>
+                                        <td><code>ascending</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>offset</code></td>
+                                        <td><%=__('insee.method_persons.offset')%></td>
+                                        <td><%=__('insee.parameter_types.positive_integer')%></td>
+                                        <td><code>0</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>limit</code></td>
+                                        <td><%=__('insee.method_persons.limit')%></td>
+                                        <td><%=__('insee.parameter_types.integer_from')%> <code>0</code> <%=__('common.to')%> <code>100</code></td>
+                                        <td><code>10</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <p><sup>*</sup><%=__('insee.see_below')%></p>
+
+                            <p>
+                                <%=__('insee.example')%> <kbd>https://insee.arbre.app/persons?surname=chirac&name=jacques+rene</kbd>
+                            </p>
+                            <pre><code>
+{
+  "code": 200,
+  "count": 1,
+  "results": [
+    {
+      "birthDate": "1932-11-29",
+      "birthPlace": "Paris 5e Arrondissement, Paris, Île-de-France, France",
+      "deathDate": "2019-09-26",
+      "deathPlace": "Paris 6e Arrondissement, Paris, Île-de-France, France",
+      "gender": true,
+      "nom": "CHIRAC",
+      "prenom": "Jacques René"
+    }
+  ]
+}
+                                </code></pre>
+
+                            <h5><%=__('insee.places_querying')%></h5>
+
+                            <p>
+                                <%=__('insee.places_querying_description')%>
+                            </p>
+
+                            <p>
+                                <strong><%=__('insee.method')%></strong> <kbd>/places</kbd> (<em>GET</em>)
+                            </p>
+
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"><%=__('insee.method_fields.parameter')%></th>
+                                        <th scope="col"><%=__('insee.method_fields.description')%></th>
+                                        <th scope="col"><%=__('insee.method_fields.value_type')%></th>
+                                        <th scope="col"><%=__('insee.method_fields.default_value')%></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>prefix</code></td>
+                                        <td><%=__('insee.method_places.search')%></td>
+                                        <td><%=__('insee.parameter_types.string')%></td>
+                                        <td><%=__('insee.parameter_types.required')%></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>limit</code></td>
+                                        <td><%=__('insee.method_persons.limit')%></td>
+                                        <td><%=__('insee.parameter_types.integer_from')%> <code>0</code> <%=__('common.to')%> <code>25</code></td>
+                                        <td><code>10</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <p>
+                                <%=__('insee.example')%> <kbd>https://insee.arbre.app/places?prefix=paris&limit=3</kbd>
+                            </p>
+                            <pre><code>
+{
+  "code": 200,
+  "results": [
+    {
+      "fullname": "Paris, Île-de-France, France",
+      "id": 99
+    },
+    {
+      "fullname": "Paris 14e Arrondissement, Paris, Île-de-France, France",
+      "id": 108
+    },
+    {
+      "fullname": "Paris 15e Arrondissement, Paris, Île-de-France, France",
+      "id": 103
+    }
+  ]
+}
+                                </code></pre>
+
+                            <h5><%=__('insee.geographical_stats')%></h5>
+
+                            <p>
+                                <%=__('insee.geographical_stats_description')%>
+                            </p>
+
+                            <p>
+                                <strong><%=__('insee.method')%></strong> <kbd>/stats/geography</kbd> (<em>GET</em>)
+                            </p>
+
+                            <table class="table table-sm">
+                                <thead>
+                                <tr>
+                                    <th scope="col"><%=__('insee.method_fields.parameter')%></th>
+                                    <th scope="col"><%=__('insee.method_fields.description')%></th>
+                                    <th scope="col"><%=__('insee.method_fields.value_type')%></th>
+                                    <th scope="col"><%=__('insee.method_fields.default_value')%></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><code>surname</code></td>
+                                    <td><%=__('insee.method_persons.surname')%></td>
+                                    <td><%=__('insee.parameter_types.string')%></td>
+                                    <td><%=__('insee.parameter_types.required')%></td>
+                                </tr>
+                                <tr>
+                                    <td><code>name</code></td>
+                                    <td><%=__('insee.method_persons.given')%></td>
+                                    <td><%=__('insee.parameter_types.string')%></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <p>
+                                <%=__('insee.example')%> <kbd>https://insee.arbre.app/stats/geography?surname=chirac&name=jacques</kbd>
+                            </p>
+                            <pre><code>
+{
+  "code": 200,
+  "results": [
+    {
+      "count": 1,
+      "name": "D-75"
+    },
+    {
+      "count": 1,
+      "name": "D-19"
+    },
+    {
+      "count": 1,
+      "name": "D-63"
+    }
+  ]
+}
+                            </code></pre>
+
+                            <h5><%=__('insee.time_stats')%></h5>
+
+                            <p>
+                                <%=__('insee.time_stats_description')%>
+                            </p>
+
+                            <p>
+                                <strong><%=__('insee.method')%></strong> <kbd>/stats/time</kbd> (<em>GET</em>)
+                            </p>
+
+                            <table class="table table-sm">
+                                <thead>
+                                <tr>
+                                    <th scope="col"><%=__('insee.method_fields.parameter')%></th>
+                                    <th scope="col"><%=__('insee.method_fields.description')%></th>
+                                    <th scope="col"><%=__('insee.method_fields.value_type')%></th>
+                                    <th scope="col"><%=__('insee.method_fields.default_value')%></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><code>surname</code></td>
+                                    <td><%=__('insee.method_persons.surname')%></td>
+                                    <td><%=__('insee.parameter_types.string')%></td>
+                                    <td><%=__('insee.parameter_types.required')%></td>
+                                </tr>
+                                <tr>
+                                    <td><code>name</code></td>
+                                    <td><%=__('insee.method_persons.given')%></td>
+                                    <td><%=__('insee.parameter_types.string')%></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td><code>place</code></td>
+                                    <td><%=__('insee.method_persons.place_id')%></td>
+                                    <td><%=__('insee.parameter_types.positive_integer')%></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td><code>event</code></td>
+                                    <td><%=__('insee.method_persons.event_type')%></td>
+                                    <td><code>birth</code> <%=__('common.or')%> <code>death</code></td>
+                                    <td><code>birth</code></td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <p>
+                                <%=__('insee.example')%> <kbd>https://insee.arbre.app/stats/time?surname=chirac&name=jacques&event=birth</kbd>
+                            </p>
+                            <pre><code>
+{
+  "code": 200,
+  "results": [
+    {
+      "count": 1,
+      "name": "1926"
+    },
+    {
+      "count": 1,
+      "name": "1932"
+    }
+  ]
+}
+                            </code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

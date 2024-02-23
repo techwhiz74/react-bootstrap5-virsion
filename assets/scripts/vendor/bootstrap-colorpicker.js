@@ -1,0 +1,1 @@
+import 'bootstrapv5-colorpicker';
